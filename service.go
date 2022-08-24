@@ -54,8 +54,7 @@ func (s *MongoService[T]) Update(ctx context.Context, id string, update *T) (*Mo
 		return nil, fmt.Errorf("invalid object id format: %w", err)
 	}
 
-	now := time.Now()
-	updateBSON := &updateBSON[*T]{Data: update, CreatedAt: now, UpdatedAt: now}
+	updateBSON := &updateBSON[*T]{Data: update, UpdatedAt: time.Now()}
 
 	_, err = s.db.Collection(s.collectionName).UpdateOne(ctx, bson.M{"_id": objID}, bson.M{"$set": updateBSON})
 	if err != nil {
@@ -81,6 +80,5 @@ func (s *MongoService[T]) Delete(ctx context.Context, id string) error {
 
 type updateBSON[T any] struct {
 	Data      T         `bson:"inline"`
-	CreatedAt time.Time `bson:"created_at"`
 	UpdatedAt time.Time `bson:"updated_at"`
 }
